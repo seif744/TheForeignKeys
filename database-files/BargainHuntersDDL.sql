@@ -93,6 +93,31 @@ CREATE TABLE listings (
 );
 
 -- ------------------------------------------------------------
+CREATE TABLE alerts (
+                        alert_id        INT             NOT NULL AUTO_INCREMENT,
+                        watch_type      ENUM('item', 'category', 'listing') NOT NULL,
+                        date_started    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        date_ended      DATETIME,
+                        is_active       BOOLEAN         NOT NULL DEFAULT TRUE,
+                        drop_amt        DECIMAL(10, 2),
+                        drop_percent    DECIMAL(5, 2),
+                        watchlist_id    INT             NOT NULL,
+                        item_id         INT,                       -- FK: nullable — alert targets item OR category OR listing
+                        cat_id          INT,                       -- FK: nullable — alert targets item OR category OR listing
+                        listing_id      INT,                       -- FK: nullable — alert targets item OR category OR listing
+                        PRIMARY KEY (alert_id),
+                        CONSTRAINT fk_alerts_item
+                            FOREIGN KEY (item_id) REFERENCES items(item_id)
+                                ON DELETE SET NULL,
+                        CONSTRAINT fk_alerts_category
+                            FOREIGN KEY (cat_id) REFERENCES categories(cat_id)
+                                ON DELETE SET NULL,
+                        CONSTRAINT fk_alerts_listing
+                            FOREIGN KEY (listing_id) REFERENCES listings(listing_id)
+                                ON DELETE SET NULL
+
+);
+-- ------------------------------------------------------------
 
 CREATE TABLE watchlist (
 
@@ -111,38 +136,6 @@ CREATE TABLE watchlist (
 
 -- ------------------------------------------------------------
 
-
-CREATE TABLE alerts (
-                        alert_id        INT             NOT NULL AUTO_INCREMENT,
-                        watch_type      ENUM('item', 'category', 'listing') NOT NULL,
-                        date_started    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        date_ended      DATETIME,
-                        is_active       BOOLEAN         NOT NULL DEFAULT TRUE,
-                        drop_amt        DECIMAL(10, 2),
-                        drop_percent    DECIMAL(5, 2),
-                        watchlist_id    INT             NOT NULL,
-                        item_id         INT,                       -- FK: nullable — alert targets item OR category OR listing
-                        cat_id          INT,                       -- FK: nullable — alert targets item OR category OR listing
-                        listing_id      INT,                       -- FK: nullable — alert targets item OR category OR listing
-                        PRIMARY KEY (alert_id),
-                        CONSTRAINT fk_alerts_watchlist
-                            FOREIGN KEY (watchlist_id) REFERENCES watchlist(watchlist_id)
-                                ON DELETE CASCADE,
-                        CONSTRAINT fk_alerts_item
-                            FOREIGN KEY (item_id) REFERENCES items(item_id)
-                                ON DELETE SET NULL,
-                        CONSTRAINT fk_alerts_category
-                            FOREIGN KEY (cat_id) REFERENCES categories(cat_id)
-                                ON DELETE SET NULL,
-                        CONSTRAINT fk_alerts_listing
-                            FOREIGN KEY (listing_id) REFERENCES listings(listing_id)
-                                ON DELETE SET NULL
-
-);
-
-
--- ------------------------------------------------------------
-
 CREATE TABLE notifications (
                                notification_id INT             NOT NULL AUTO_INCREMENT,
                                content         TEXT            NOT NULL,
@@ -157,3 +150,38 @@ CREATE TABLE notifications (
                                    FOREIGN KEY (alert_id) REFERENCES alerts(alert_id)
                                        ON DELETE CASCADE
 );
+--Insert statement for users table
+INSERT INTO users (name, email) VALUES
+('Alice Johnson', 'alice@example.com'),
+('Bob Smith', 'bob@example.com'),
+('Charlie Brown', 'charlie@example.com'),
+('Diana Prince', 'diana@example.com'),
+('Ethan Hunt', 'ethan@example.com');
+--Insert statement for categories table
+INSERT INTO categories (cat_id, cat_name, url, current_price) VALUES
+(1001, 'Electronics', 'https://example.com/electronics', 250.00),
+(1002, 'Fashion', 'https://example.com/fashion', 75.50),
+(1003, 'Home & Garden', 'https://example.com/home', 120.99),
+(1004, 'Toys', 'https://example.com/toys', 45.00),
+(1005, 'Sports', 'https://example.com/sports', 89.99);
+--Insert statement for items table
+INSERT INTO items (item_id, item_name, url, current_price) VALUES
+(2001, 'iPhone 13', 'https://example.com/iphone13', 699.99),
+(2002, 'Nike Sneakers', 'https://example.com/nike', 120.00),
+(2003, 'Coffee Maker', 'https://example.com/coffee', 49.99),
+(2004, 'Lego Set', 'https://example.com/lego', 59.99),
+(2005, 'Basketball', 'https://example.com/basketball', 25.00);
+--Insert statemnt for listings table
+INSERT INTO listings (listing_id, listing_name, url, current_price) VALUES
+(3001, 'iPhone 13 - Used', 'https://example.com/listing1', 650.00),
+(3002, 'Nike Sneakers Sale', 'https://example.com/listing2', 100.00),
+(3003, 'Coffee Maker Discount', 'https://example.com/listing3', 39.99),
+(3004, 'Lego Set Bundle', 'https://example.com/listing4', 55.00),
+(3005, 'Basketball Deal', 'https://example.com/listing5', 20.00);
+--Insert statement for user activity table
+INSERT INTO user_activity (event_type, user_id) VALUES
+('login', 1),
+('search_item', 2),
+('add_to_watchlist', 3),
+('view_listing', 1),
+('logout', 4);
