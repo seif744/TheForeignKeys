@@ -101,7 +101,6 @@ CREATE TABLE alerts (
                         is_active       BOOLEAN         NOT NULL DEFAULT TRUE,
                         drop_amt        DECIMAL(10, 2),
                         drop_percent    DECIMAL(5, 2),
-                        watchlist_id    INT             NOT NULL,
                         item_id         INT,                       -- FK: nullable — alert targets item OR category OR listing
                         cat_id          INT,                       -- FK: nullable — alert targets item OR category OR listing
                         listing_id      INT,                       -- FK: nullable — alert targets item OR category OR listing
