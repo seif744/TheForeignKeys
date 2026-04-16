@@ -153,18 +153,48 @@ def get_alert(alert_id):
 
 @alerts.route("/", methods=["POST"])
 def create_alert():
+    data = request.get_json()
+    for field in ("watch_type", "user_id"):
+        if not data or field not in data:
+            return jsonify({"error": f"Missing required field: {field}"}), 400
+
+    watch_type = data["watch_type"]
+
+    # Resolve entity ID and fetch current price from eBay
+    try:
+        if watch_type == "listing":
+            entity_id = data.get("listing_id")
+            if not entity_id:
+                return jsonify({"error": "Missing required field: listing_id"}), 400
+            entity = ebay_client.get_listing(entity_id)
+        elif watch_type == "item":
+            entity_id = data.get("item_id")
+            if not entity_id:
+                return jsonify({"error": "Missing required field: item_id"}), 400
+            entity = ebay_client.get_item(entity_id)
+        elif watch_type == "category":
+            entity_id = data.get("cat_id")
+            if not entity_id:
+                return jsonify({"error": "Missing required field: cat_id"}), 400
+            entity = ebay_client.get_category(entity_id)
+        else:
+            return jsonify({"error": f"Invalid watch_type: {watch_type}"}), 400
+    except (ConnectionError, RuntimeError) as e:
+        current_app.logger.error(f"eBay API error in POST /alerts/: {e}")
+        return jsonify({"error": "eBay API unreachable"}), 502
+
+    if not entity["in_stock"]:
+        return jsonify({"error": f"No active eBay listings found for {watch_type} {entity_id}"}), 404
+
     db = get_db()
     cursor = db.cursor(dictionary=True)
     try:
-        data = request.get_json()
-        for field in ("watch_type", "user_id"):
-            if not data or field not in data:
-                return jsonify({"error": f"Missing required field: {field}"}), 400
+        _upsert_entity(cursor, watch_type, entity)
 
-        watch_type = data["watch_type"]
-        item_id = data.get("item_id")
-        cat_id = data.get("cat_id")
-        listing_id = data.get("listing_id")
+        item_id = entity["id"] if watch_type == "item" else None
+        cat_id = entity["id"] if watch_type == "category" else None
+        listing_id = entity["id"] if watch_type == "listing" else None
+        original_price = entity["current_price"]
 
         cursor.execute(
             """
@@ -180,7 +210,7 @@ def create_alert():
                 item_id,
                 cat_id,
                 listing_id,
-                data.get("original_price"),
+                original_price,
             ),
         )
         alert_id = cursor.lastrowid
@@ -189,9 +219,16 @@ def create_alert():
             (data["user_id"], alert_id),
         )
         db.commit()
-        return jsonify({"alert_id": alert_id}), 201
+        return jsonify({
+            "alert_id": alert_id,
+            "watch_type": watch_type,
+            "target_name": entity["name"],
+            "original_price": original_price,
+            "drop_amt": data.get("drop_amt"),
+            "drop_percent": data.get("drop_percent"),
+        }), 201
     except Error as e:
-        current_app.logger.error(f"POST /alerts/ error: {e}")
+        current_app.logger.error(f"POST /alerts/ DB error: {e}")
         return jsonify({"error": str(e)}), 500
     finally:
         cursor.close()
@@ -226,11 +263,12 @@ def create_alert_from_url():
             entity = ebay_client.get_category(entity_id)
         else:
             return jsonify({"error": f"Invalid watch_type: {watch_type}"}), 400
-    except LookupError as e:
-        return jsonify({"error": str(e)}), 404
     except (ConnectionError, RuntimeError) as e:
         current_app.logger.error(f"eBay API error in from-url: {e}")
         return jsonify({"error": "eBay API unreachable"}), 502
+
+    if not entity["in_stock"]:
+        return jsonify({"error": f"No active eBay listings found for {watch_type} {entity_id}"}), 404
 
     # 3. Upsert entity + insert alert in one transaction
     db = get_db()
