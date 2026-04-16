@@ -1,150 +1,131 @@
 """
-Thin wrapper around the eBay Browse API.
+Thin wrapper around the SerpAPI eBay endpoints.
 
 Environment variables required:
-  EBAY_APP_ID   — OAuth client_id  (also called AppID)
-  EBAY_CERT_ID  — OAuth client_secret (also called CertID)
+  SERPAPI_KEY — API key from https://serpapi.com
 
-Tokens are fetched with the Client Credentials grant and cached in memory
-until they expire. Thread safety is not a concern for the dev/course setup.
+No OAuth needed — SerpAPI handles eBay authentication internally.
+All functions return a uniform dict:
+    {"id": int, "name": str, "url": str, "current_price": float}
 """
 import os
-import time
-import base64
 import requests
 
-_token_cache = {"access_token": None, "expires_at": 0}
-
-EBAY_API_BASE = "https://api.ebay.com"
-EBAY_TOKEN_URL = f"{EBAY_API_BASE}/identity/v1/oauth2/token"
-EBAY_BROWSE_BASE = f"{EBAY_API_BASE}/buy/browse/v1"
-EBAY_SCOPE = "https://api.ebay.com/oauth/api_scope"
+SERPAPI_BASE = "https://serpapi.com/search"
 
 
-def _get_access_token():
-    if time.time() < _token_cache["expires_at"] - 30:
-        return _token_cache["access_token"]
+def _api_key() -> str:
+    key = os.getenv("SERPAPI_KEY")
+    if not key:
+        raise RuntimeError("SERPAPI_KEY must be set in environment")
+    return key
 
-    app_id = os.getenv("EBAY_APP_ID")
-    cert_id = os.getenv("EBAY_CERT_ID")
-    if not app_id or not cert_id:
-        raise RuntimeError("EBAY_APP_ID and EBAY_CERT_ID must be set")
 
-    credentials = base64.b64encode(f"{app_id}:{cert_id}".encode()).decode()
-    resp = requests.post(
-        EBAY_TOKEN_URL,
-        headers={
-            "Authorization": f"Basic {credentials}",
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        data={"grant_type": "client_credentials", "scope": EBAY_SCOPE},
-        timeout=10,
-    )
+def _get(params: dict) -> dict:
+    """Shared GET helper — raises ConnectionError on bad HTTP status."""
+    resp = requests.get(SERPAPI_BASE, params=params, timeout=10)
     if not resp.ok:
-        raise ConnectionError(f"eBay token request failed: {resp.status_code} {resp.text}")
-
-    body = resp.json()
-    _token_cache["access_token"] = body["access_token"]
-    _token_cache["expires_at"] = time.time() + int(body.get("expires_in", 7200))
-    return _token_cache["access_token"]
-
-
-def _auth_headers():
-    return {"Authorization": f"Bearer {_get_access_token()}"}
+        raise ConnectionError(f"SerpAPI error: {resp.status_code} {resp.text}")
+    return resp.json()
 
 
 def get_listing(listing_id: int) -> dict:
     """
-    Fetch a single eBay listing (by legacyItemId).
+    Fetch a single eBay listing by legacy item number.
+
+    eBay item numbers are globally unique so the first organic result
+    is always the exact listing.
 
     Returns:
         {"id": int, "name": str, "url": str, "current_price": float}
     Raises:
-        LookupError if eBay returns 404.
-        ConnectionError on non-recoverable HTTP errors.
+        LookupError if no results are found.
+        ConnectionError on HTTP errors.
     """
-    item_id_str = f"v1|{listing_id}|0"
-    resp = requests.get(
-        f"{EBAY_BROWSE_BASE}/item/{item_id_str}",
-        headers=_auth_headers(),
-        timeout=10,
-    )
-    if resp.status_code == 404:
-        raise LookupError(f"eBay listing {listing_id} not found")
-    if not resp.ok:
-        raise ConnectionError(f"eBay API error: {resp.status_code} {resp.text}")
+    data = _get({
+        "engine": "ebay",
+        "api_key": _api_key(),
+        "_nkw": str(listing_id),
+    })
 
-    data = resp.json()
-    price = float(data.get("price", {}).get("value", 0))
+    results = data.get("organic_results", [])
+    if not results:
+        raise LookupError(f"eBay listing {listing_id} not found")
+
+    best = results[0]
+    price = float((best.get("price") or {}).get("extracted") or 0)
     return {
         "id": listing_id,
-        "name": data.get("title", ""),
-        "url": data.get("itemWebUrl", ""),
+        "name": best.get("title", ""),
+        "url": best.get("link", ""),
         "current_price": price,
     }
 
 
 def get_item(item_id: int) -> dict:
     """
-    Search eBay for listings matching an EPID and return the lowest price.
+    Fetch eBay product listings by EPID and return the lowest-priced result.
 
     Returns:
         {"id": int, "name": str, "url": str, "current_price": float}
+    Raises:
+        LookupError if no listings are found for this EPID.
+        ConnectionError on HTTP errors.
     """
-    resp = requests.get(
-        f"{EBAY_BROWSE_BASE}/item_summary/search",
-        headers=_auth_headers(),
-        params={"epid": str(item_id), "limit": 50, "sort": "price"},
-        timeout=10,
-    )
-    if not resp.ok:
-        raise ConnectionError(f"eBay API error: {resp.status_code} {resp.text}")
+    data = _get({
+        "engine": "ebay_product",
+        "api_key": _api_key(),
+        "_epid": str(item_id),
+    })
 
-    summaries = resp.json().get("itemSummaries", [])
-    if not summaries:
+    results = data.get("organic_results", [])
+    if not results:
         raise LookupError(f"No eBay listings found for item/EPID {item_id}")
 
-    best = summaries[0]
-    price = float(best.get("price", {}).get("value", 0))
+    best = results[0]
+    price = float((best.get("price") or {}).get("extracted") or 0)
     return {
         "id": item_id,
         "name": best.get("title", ""),
-        "url": best.get("itemWebUrl", ""),
+        "url": best.get("link", ""),
         "current_price": price,
     }
 
 
 def get_category(cat_id: int) -> dict:
     """
-    Search eBay for the cheapest listing in a category.
+    Search eBay for the cheapest listing in a given category.
+
+    Uses _sop=15 (sort by lowest price + shipping).
 
     Returns:
         {"id": int, "name": str, "url": str, "current_price": float}
+    Raises:
+        LookupError if no listings are found in this category.
+        ConnectionError on HTTP errors.
     """
-    resp = requests.get(
-        f"{EBAY_BROWSE_BASE}/item_summary/search",
-        headers=_auth_headers(),
-        params={"category_ids": str(cat_id), "limit": 50, "sort": "price"},
-        timeout=10,
-    )
-    if not resp.ok:
-        raise ConnectionError(f"eBay API error: {resp.status_code} {resp.text}")
+    data = _get({
+        "engine": "ebay",
+        "api_key": _api_key(),
+        "_sacat": str(cat_id),
+        "_sop": "15",   # lowest price + shipping first
+    })
 
-    data = resp.json()
-    summaries = data.get("itemSummaries", [])
-    if not summaries:
+    results = data.get("organic_results", [])
+    if not results:
         raise LookupError(f"No eBay listings found for category {cat_id}")
 
-    best = summaries[0]
-    price = float(best.get("price", {}).get("value", 0))
+    best = results[0]
+    price = float((best.get("price") or {}).get("extracted") or 0)
+
+    # SerpAPI may include a category name in search_information
     cat_name = (
-        data.get("refinement", {})
-        .get("dominantCategoryAspects", [{}])[0]
-        .get("localizedAspectName", f"Category {cat_id}")
+        data.get("search_information", {}).get("category_name")
+        or f"Category {cat_id}"
     )
     return {
         "id": cat_id,
         "name": cat_name,
-        "url": best.get("itemWebUrl", ""),
+        "url": best.get("link", ""),
         "current_price": price,
     }

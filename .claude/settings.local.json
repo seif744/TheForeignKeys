@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/might/OneDrive/Desktop/TheForeignKeys/api -name \"__init__.py\" -exec cat {} \\\\;)"
+    ]
+  }
+}
