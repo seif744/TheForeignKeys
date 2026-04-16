@@ -37,9 +37,9 @@ def get_listing(listing_id: int) -> dict:
     is always the exact listing.
 
     Returns:
-        {"id": int, "name": str, "url": str, "current_price": float}
+        {"id": int, "name": str, "url": str, "current_price": float, "in_stock": bool}
+        in_stock is False (with price 0.0 and empty name/url) when no active listings are found.
     Raises:
-        LookupError if no results are found.
         ConnectionError on HTTP errors.
     """
     data = _get({
@@ -50,7 +50,7 @@ def get_listing(listing_id: int) -> dict:
 
     results = data.get("organic_results", [])
     if not results:
-        raise LookupError(f"eBay listing {listing_id} not found")
+        return {"id": listing_id, "name": "", "url": "", "current_price": 0.0, "in_stock": False}
 
     best = results[0]
     price = float((best.get("price") or {}).get("extracted") or 0)
@@ -59,6 +59,7 @@ def get_listing(listing_id: int) -> dict:
         "name": best.get("title", ""),
         "url": best.get("link", ""),
         "current_price": price,
+        "in_stock": True,
     }
 
 
@@ -67,9 +68,9 @@ def get_item(item_id: int) -> dict:
     Fetch eBay product listings by EPID and return the lowest-priced result.
 
     Returns:
-        {"id": int, "name": str, "url": str, "current_price": float}
+        {"id": int, "name": str, "url": str, "current_price": float, "in_stock": bool}
+        in_stock is False (with price 0.0 and empty name/url) when no active listings are found.
     Raises:
-        LookupError if no listings are found for this EPID.
         ConnectionError on HTTP errors.
     """
     data = _get({
@@ -80,7 +81,7 @@ def get_item(item_id: int) -> dict:
 
     results = data.get("organic_results", [])
     if not results:
-        raise LookupError(f"No eBay listings found for item/EPID {item_id}")
+        return {"id": item_id, "name": "", "url": "", "current_price": 0.0, "in_stock": False}
 
     best = results[0]
     price = float((best.get("price") or {}).get("extracted") or 0)
@@ -89,6 +90,7 @@ def get_item(item_id: int) -> dict:
         "name": best.get("title", ""),
         "url": best.get("link", ""),
         "current_price": price,
+        "in_stock": True,
     }
 
 
@@ -99,9 +101,9 @@ def get_category(cat_id: int) -> dict:
     Uses _sop=15 (sort by lowest price + shipping).
 
     Returns:
-        {"id": int, "name": str, "url": str, "current_price": float}
+        {"id": int, "name": str, "url": str, "current_price": float, "in_stock": bool}
+        in_stock is False (with price 0.0) when no active listings are found in this category.
     Raises:
-        LookupError if no listings are found in this category.
         ConnectionError on HTTP errors.
     """
     data = _get({
@@ -113,7 +115,7 @@ def get_category(cat_id: int) -> dict:
 
     results = data.get("organic_results", [])
     if not results:
-        raise LookupError(f"No eBay listings found for category {cat_id}")
+        return {"id": cat_id, "name": f"Category {cat_id}", "url": "", "current_price": 0.0, "in_stock": False}
 
     best = results[0]
     price = float((best.get("price") or {}).get("extracted") or 0)
@@ -128,4 +130,5 @@ def get_category(cat_id: int) -> dict:
         "name": cat_name,
         "url": best.get("link", ""),
         "current_price": price,
+        "in_stock": True,
     }
