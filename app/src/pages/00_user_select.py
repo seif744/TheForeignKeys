@@ -89,3 +89,7 @@ with right:
         <div style="color:#555; font-size:0.75rem;">ID &nbsp;#{u['user_id']}</div>
     </div>
     """, unsafe_allow_html=True)
+
+# ── Feedback footer ──────────────────────────────────────────────
+with st._bottom:
+    st.page_link("pages/05_feedback.py", label="Feedback", icon='💬')

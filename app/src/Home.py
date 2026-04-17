@@ -6,7 +6,7 @@ import os
 import streamlit as st
 from modules.nav import SideBarLinks, LOGO_PATH
 
-st.set_page_config(page_title="BargainHunters", page_icon="🎯", layout="wide")
+st.set_page_config(page_title="BargainHunters", page_icon="🎯", layout="wide", initial_sidebar_state= "expanded")
 
 st.session_state['authenticated'] = False
 SideBarLinks(show_home=True)

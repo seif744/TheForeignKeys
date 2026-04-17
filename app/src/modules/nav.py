@@ -7,7 +7,7 @@ _ASSETS_DIR = os.path.abspath(
 LOGO_PATH = os.path.join(_ASSETS_DIR, "logo.png")
 
 
-def inject_global_css():
+def inject_global_css() -> None:
     st.markdown("""
     <style>
     #MainMenu, footer, header { visibility: hidden; }
@@ -71,25 +71,25 @@ def inject_global_css():
 
 # ── Nav helpers ────────────────────────────────────────────────────────────
 
-def user_select_nav():
+def user_select_nav() -> None:
     st.sidebar.page_link("pages/00_user_select.py", label="Switch User",     icon="👤")
 
-def watchlist_nav():
+def watchlist_nav() -> None:
     st.sidebar.page_link("pages/04_watchlist.py",   label="My Watchlist",    icon="👁️")
 
-def alert_creation_nav():
+def alert_creation_nav() -> None:
     st.sidebar.page_link("pages/01_alert_creation.py", label="Add Alert",    icon="🔔")
 
-def statistics_nav():
+def statistics_nav() -> None:
     st.sidebar.page_link("pages/02_statistics.py",  label="Statistics",      icon="📊")
 
-def feedback_nav():
+def feedback_nav() -> None:
     st.sidebar.page_link("pages/05_feedback.py",    label="Submit Feedback", icon="💬")
 
 
 # ── Sidebar assembly ───────────────────────────────────────────────────────
 
-def SideBarLinks(show_home=False):
+def SideBarLinks(show_home=False) -> None:
     inject_global_css()
 
     if os.path.exists(LOGO_PATH):
