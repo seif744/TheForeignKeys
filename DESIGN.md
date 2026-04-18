@@ -542,6 +542,7 @@ Core table. Targets exactly one of: item, category, or listing.
 | is_active | BOOLEAN | DEFAULT TRUE |
 | drop_amt | DECIMAL(10,2) | Nullable — dollar threshold |
 | drop_percent | DECIMAL(5,2) | Nullable — percent threshold |
+| original_price | DECIMAL(10,2) | Nullable — price at time of alert creation; baseline for drop comparisons |
 | item_id | INT FK → items | Nullable, ON DELETE SET NULL |
 | cat_id | INT FK → categories | Nullable, ON DELETE SET NULL |
 | listing_id | INT FK → listings | Nullable, ON DELETE SET NULL |

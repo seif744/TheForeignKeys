@@ -33,5 +33,21 @@ services:
     ports:
       - 3200:3306
 
+  notifier:
+    build: ./notifier
+    container_name: notifier
+    hostname: notifier
+    env_file:
+      - ./api/.env
+    environment:
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - API_BASE=http://web-api:4000
+    depends_on:
+      - db
+      - api
+
 volumes:
   mysql_data:
