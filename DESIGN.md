@@ -68,6 +68,7 @@ BargainHunters/
 │   │   ├── notifications/        # Blueprint: notification routes
 │   │   ├── feedback/             # Blueprint: feedback routes
 │   │   ├── errors/               # Blueprint: error routes
+│   │   ├── ebay/                 # Blueprint: eBay API proxy routes
 │   │   └── analyst/              # Blueprint: analyst export routes
 │   ├── rest_entry.py             # Flask app factory + blueprint registration
 │   ├── backend_app.py            # Entry point
@@ -232,6 +233,31 @@ Accepts an eBay URL and alert configuration, fetches entity data from the eBay B
 | GET | `/errors/` | Get all errors (admin) |
 | GET | `/errors/user/<user_id>` | Get errors for a specific user |
 | POST | `/errors/` | Log a new error |
+
+### eBay — `/ebay`
+
+Thin proxy to `ebay_client.py` (SerpAPI wrapper). Returns live eBay data without writing to the database. Useful for looking up entity details before creating an alert.
+
+| Method | Route | Query Param | Description |
+|---|---|---|---|
+| GET | `/ebay/listing` | `listing_id=<int>` | Fetch a single eBay listing by legacy item number |
+| GET | `/ebay/item` | `item_id=<int>` | Fetch eBay product listings by EPID (lowest-priced result) |
+| GET | `/ebay/category` | `cat_id=<int>` | Fetch the cheapest listing in a given eBay category |
+
+**Response (200):**
+```json
+{
+  "id": 123456789,
+  "name": "Apple AirPods Pro 2nd Gen",
+  "url": "https://www.ebay.com/itm/123456789",
+  "current_price": 189.99,
+  "in_stock": true
+}
+```
+
+**Error responses:**
+- `400` — missing required query parameter
+- `502` — SerpAPI / eBay API unreachable
 
 ---
 

@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, current_app
-from ..db_connection import get_db
+from backend.db_connection import get_db
 from mysql.connector import Error
 
 errors = Blueprint("errors", __name__)
