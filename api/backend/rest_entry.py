@@ -13,6 +13,7 @@ from backend.items.item_routes import items
 from backend.categories.category_routes import categories
 from backend.feedback.feedback_routes import feedback
 from backend.errors.error_routes import errors
+from backend.ebay.ebay_routes import ebay
 
 
 def create_app():
@@ -43,5 +44,6 @@ def create_app():
     app.register_blueprint(categories,    url_prefix="/categories")
     app.register_blueprint(feedback,      url_prefix="/feedback")
     app.register_blueprint(errors,        url_prefix="/errors")
+    app.register_blueprint(ebay,          url_prefix="/ebay")
 
     return app

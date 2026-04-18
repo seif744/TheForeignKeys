@@ -2,8 +2,8 @@ import re
 from urllib.parse import urlparse, parse_qs
 
 from flask import Blueprint, jsonify, request, current_app
-from ..db_connection import get_db
-from .. import ebay_client
+from backend.db_connection import get_db
+from backend import ebay_client
 from mysql.connector import Error
 
 alerts = Blueprint("alerts", __name__)
