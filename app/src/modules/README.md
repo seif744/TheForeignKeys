@@ -8,12 +8,12 @@ BargainHunters is a full-stack eBay price monitoring application. Users add eBay
 
 ## Team
 
-| Name | GitHub |
+| Name |
 |---|---|
-| Seifer Mathias | seif744 |
-| Jason Jathanna | — |
-| Ishaan Mody | — |
-| Nicolas Aguiar | — |
+| Seifer Mathias | 
+| Jason Jathanna |
+| Ishaan Mody | 
+| Nicolas Aguiar |
 
 ---
 
