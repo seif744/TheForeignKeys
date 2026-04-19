@@ -23,7 +23,7 @@ BargainHunters is a full-stack eBay price monitoring application. Users add eBay
 |---|---|
 | Frontend | Python · Streamlit |
 | Backend API | Python · Flask (REST) |
-| Database | MySQL 9 |
+| Database | SQLite |
 | eBay Data | SerpAPI (eBay engine) |
 | Containerization | Docker · Docker Compose |
 
