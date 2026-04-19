@@ -1,125 +1,136 @@
-# Idea borrowed from https://github.com/fsmosca/sample-streamlit-authenticator
-
-# This file has functions to add links to the left sidebar based on the user's role.
-
+import os
 import streamlit as st
 
-
-# ---- General ----------------------------------------------------------------
-
-def home_nav():
-    st.sidebar.page_link("Home.py", label="Home", icon="🏠")
-
-
-def about_page_nav():
-    st.sidebar.page_link("pages/30_About.py", label="About", icon="🧠")
+_ASSETS_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets')
+)
+LOGO_PATH = os.path.join(_ASSETS_DIR, "logo.png")
 
 
-# ---- Role: pol_strat_advisor ------------------------------------------------
+def inject_global_css() -> None:
+    st.markdown("""
+    <style>
+    #MainMenu, footer { visibility: hidden; }
 
-def pol_strat_home_nav():
-    st.sidebar.page_link(
-        "pages/00_Pol_Strat_Home.py", label="Political Strategist Home", icon="👤"
-    )
+    /* keep header in the DOM so the sidebar toggle stays clickable */
+    header[data-testid="stHeader"] {
+        background: #0a0a0a !important;
+        border-bottom: 1px solid #1a1a1a !important;
+    }
+
+    .stApp { background: #0a0a0a; }
+
+    /* ── typography ─────────────────────────────────────────────── */
+    .page-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.01em;
+        margin-bottom: 0.2rem;
+    }
+    .page-sub {
+        font-size: 0.95rem;
+        color: #888;
+        margin-bottom: 1.6rem;
+    }
+
+    /* ── cards ──────────────────────────────────────────────────── */
+    .card {
+        background: #111111;
+        border: 1px solid #1e1e1e;
+        border-radius: 10px;
+        padding: 1.6rem 1.8rem;
+        margin-bottom: 1rem;
+    }
+    .card-accent { border-top: 2px solid #cc2222; }
+
+    /* ── section label ──────────────────────────────────────────── */
+    .section-label {
+        color: #d4621a;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 0.35rem;
+    }
+
+    /* ── user chip ──────────────────────────────────────────────── */
+    .user-chip {
+        background: #111111;
+        border: 1px solid #1e1e1e;
+        border-radius: 8px;
+        padding: 0.7rem 0.9rem;
+        margin: 0.4rem 0 0.8rem 0;
+    }
+    .user-chip .label { color: #555; font-size: 0.67rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .user-chip .name  { color: #f5f5f5; font-weight: 700; margin-top: 0.15rem; font-size: 0.9rem; }
+    .user-chip .email { color: #d4621a; font-size: 0.76rem; margin-top: 0.1rem; }
+
+    /* ── sidebar ────────────────────────────────────────────────── */
+    section[data-testid="stSidebar"] {
+        background: #080808;
+        border-right: 1px solid #1a1a1a;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 
-def world_bank_viz_nav():
-    st.sidebar.page_link(
-        "pages/01_World_Bank_Viz.py", label="World Bank Visualization", icon="🏦"
-    )
+# ── Nav helpers ────────────────────────────────────────────────────────────
+
+def user_select_nav() -> None:
+    st.sidebar.page_link("pages/00_user_select.py", label="Switch User",     icon="👤")
+
+def watchlist_nav() -> None:
+    st.sidebar.page_link("pages/04_watchlist.py",   label="My Watchlist",    icon="👁️")
+
+def alert_creation_nav() -> None:
+    st.sidebar.page_link("pages/01_alert_creation.py", label="Add Alert",    icon="🔔")
+
+def statistics_nav() -> None:
+    st.sidebar.page_link("pages/02_statistics.py",  label="Statistics",      icon="📊")
+
+def feedback_nav() -> None:
+    st.sidebar.page_link("pages/05_feedback.py",    label="Submit Feedback", icon="💬")
 
 
-def map_demo_nav():
-    st.sidebar.page_link("pages/02_Map_Demo.py", label="Map Demonstration", icon="🗺️")
+# ── Sidebar assembly ───────────────────────────────────────────────────────
 
+def SideBarLinks(show_home=False) -> None:
+    inject_global_css()
 
-# ---- Role: usaid_worker -----------------------------------------------------
+    if os.path.exists(LOGO_PATH):
+        with st.sidebar:
+            st.image(LOGO_PATH, use_container_width=True)
 
-def usaid_worker_home_nav():
-    st.sidebar.page_link(
-        "pages/10_USAID_Worker_Home.py", label="USAID Worker Home", icon="🏠"
-    )
-
-
-def ngo_directory_nav():
-    st.sidebar.page_link("pages/14_NGO_Directory.py", label="NGO Directory", icon="📁")
-
-
-def add_ngo_nav():
-    st.sidebar.page_link("pages/15_Add_NGO.py", label="Add New NGO", icon="➕")
-
-
-def prediction_nav():
-    st.sidebar.page_link(
-        "pages/11_Prediction.py", label="Regression Prediction", icon="📈"
-    )
-
-
-def api_test_nav():
-    st.sidebar.page_link("pages/12_API_Test.py", label="Test the API", icon="🛜")
-
-
-def classification_nav():
-    st.sidebar.page_link(
-        "pages/13_Classification.py", label="Classification Demo", icon="🌺"
-    )
-
-
-# ---- Role: administrator ----------------------------------------------------
-
-def admin_home_nav():
-    st.sidebar.page_link("pages/20_Admin_Home.py", label="System Admin", icon="🖥️")
-
-
-def ml_model_mgmt_nav():
-    st.sidebar.page_link(
-        "pages/21_ML_Model_Mgmt.py", label="ML Model Management", icon="🏢"
-    )
-
-
-# ---- Sidebar assembly -------------------------------------------------------
-
-def SideBarLinks(show_home=False):
-    """
-    Renders sidebar navigation links based on the logged-in user's role.
-    The role is stored in st.session_state when the user logs in on Home.py.
-    """
-
-    # Logo appears at the top of the sidebar on every page
-    st.sidebar.image("assets/logo.png", width=150)
-
-    # If no one is logged in, send them to the Home (login) page
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
         st.switch_page("Home.py")
 
     if show_home:
-        home_nav()
+        st.sidebar.page_link("Home.py", label="Home", icon="🏠")
 
-    if st.session_state["authenticated"]:
+    if st.session_state.get("authenticated"):
+        user_name = st.session_state.get("user_name", "")
+        if user_name:
+            st.sidebar.markdown(f"""
+            <div class="user-chip">
+                <div class="label">Signed in as</div>
+                <div class="name">{user_name}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-        if st.session_state["role"] == "pol_strat_advisor":
-            pol_strat_home_nav()
-            world_bank_viz_nav()
-            map_demo_nav()
+        st.sidebar.markdown("---")
+        st.sidebar.markdown('<div class="section-label">Menu</div>', unsafe_allow_html=True)
 
-        if st.session_state["role"] == "usaid_worker":
-            usaid_worker_home_nav()
-            ngo_directory_nav()
-            add_ngo_nav()
-            prediction_nav()
-            api_test_nav()
-            classification_nav()
+        if st.session_state.get("role") == "user":
+            watchlist_nav()
+            alert_creation_nav()
+            statistics_nav()
+            feedback_nav()
+            st.sidebar.markdown("---")
+            user_select_nav()
 
-        if st.session_state["role"] == "administrator":
-            admin_home_nav()
-            ml_model_mgmt_nav()
-
-    # About link appears at the bottom for all roles
-    about_page_nav()
-
-    if st.session_state["authenticated"]:
-        if st.sidebar.button("Logout"):
-            del st.session_state["role"]
-            del st.session_state["authenticated"]
+        if st.sidebar.button("Logout", use_container_width=True):
+            for key in ("role", "authenticated", "user_id", "user_name"):
+                st.session_state.pop(key, None)
             st.switch_page("Home.py")
