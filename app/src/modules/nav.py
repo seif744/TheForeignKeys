@@ -10,7 +10,13 @@ LOGO_PATH = os.path.join(_ASSETS_DIR, "logo.png")
 def inject_global_css() -> None:
     st.markdown("""
     <style>
-    #MainMenu, footer, header { visibility: hidden; }
+    #MainMenu, footer { visibility: hidden; }
+
+    /* keep header in the DOM so the sidebar toggle stays clickable */
+    header[data-testid="stHeader"] {
+        background: #0a0a0a !important;
+        border-bottom: 1px solid #1a1a1a !important;
+    }
 
     .stApp { background: #0a0a0a; }
 
