@@ -12,11 +12,12 @@ Usage:
 """
 
 import logging
+import os
 import requests
 
 logger = logging.getLogger(__name__)
 
-API_BASE = "http://localhost:4000"
+API_BASE = os.getenv("API_BASE", "http://api:4000")
 
 
 # ---------------------------------------------------------------------------
@@ -324,3 +325,44 @@ def log_error(error_desc: str, user_id: int) -> dict | None:
     Returns: {"error_id": int}
     """
     return _post("/errors/", {"error_desc": error_desc, "user_id": user_id})
+
+
+# ---------------------------------------------------------------------------
+# eBay  —  /ebay
+# ---------------------------------------------------------------------------
+
+def search_ebay(query: str) -> list:
+    """
+    Search eBay by keyword via SerpAPI.
+
+    Returns a list of up to 12 results:
+        [{"id": str, "name": str, "url": str, "current_price": float, "thumbnail": str}]
+    """
+    return _get("/ebay/search", params={"q": query}) or []
+
+
+def get_ebay_listing(listing_id: int) -> dict | None:
+    """
+    Fetch a single eBay listing by legacy item ID.
+
+    Returns: {"id": int, "name": str, "url": str, "current_price": float, "in_stock": bool}
+    """
+    return _get("/ebay/listing", params={"listing_id": listing_id})
+
+
+def get_ebay_item(item_id: int) -> dict | None:
+    """
+    Fetch an eBay product by EPID.
+
+    Returns: {"id": int, "name": str, "url": str, "current_price": float, "in_stock": bool}
+    """
+    return _get("/ebay/item", params={"item_id": item_id})
+
+
+def get_ebay_category(cat_id: int) -> dict | None:
+    """
+    Fetch the cheapest listing in an eBay category.
+
+    Returns: {"id": int, "name": str, "url": str, "current_price": float, "in_stock": bool}
+    """
+    return _get("/ebay/category", params={"cat_id": cat_id})

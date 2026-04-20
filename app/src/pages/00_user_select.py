@@ -9,6 +9,8 @@ import streamlit as st
 import requests
 from modules.nav import SideBarLinks, LOGO_PATH
 
+API_BASE = os.getenv("API_BASE", "http://api:4000")
+
 st.set_page_config(page_title="Select User | BargainHunters", page_icon="👤", layout="wide")
 
 SideBarLinks()
@@ -33,7 +35,7 @@ st.markdown("---")
 # ── Fetch users ────────────────────────────────────────────────────────────
 users = []
 try:
-    resp = requests.get('http://api:4000/u/', timeout=5)
+    resp = requests.get(f'{API_BASE}/u/', timeout=5)
     resp.raise_for_status()
     users = [u for u in resp.json() if u.get('is_active', True)]
     logger.info(f"Fetched {len(users)} active users")

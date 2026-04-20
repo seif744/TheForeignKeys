@@ -9,6 +9,8 @@ import streamlit as st
 import requests
 from modules.nav import SideBarLinks, LOGO_PATH
 
+API_BASE = os.getenv("API_BASE", "http://api:4000")
+
 st.set_page_config(page_title="Add Alert | BargainHunters", page_icon="🔔", layout="wide")
 
 st.markdown("""
@@ -28,6 +30,8 @@ if not st.session_state.get('authenticated'):
     st.switch_page('Home.py')
 if st.session_state.get('role') != 'user':
     st.switch_page('Home.py')
+if not st.session_state.get('user_id'):
+    st.switch_page('pages/00_user_select.py')
 
 # ── Logo + title ───────────────────────────────────────────────────────────
 logo_col, title_col = st.columns([1, 6])
@@ -84,7 +88,7 @@ with search_col:
             with st.spinner("Searching eBay…"):
                 try:
                     resp = requests.get(
-                        "http://api:4000/ebay/search",
+                        f"{API_BASE}/ebay/search",
                         params={"q": query.strip()},
                         timeout=15,
                     )
@@ -207,7 +211,7 @@ if selected:
             }
             try:
                 resp = requests.post(
-                    "http://api:4000/alerts/from-url",
+                    f"{API_BASE}/alerts/from-url",
                     json=payload,
                     timeout=15,
                 )

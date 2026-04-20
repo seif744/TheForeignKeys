@@ -10,7 +10,7 @@ import requests
 import pandas as pd
 from modules.nav import SideBarLinks, LOGO_PATH
 
-API = "http://api:4000"
+API = os.getenv("API_BASE", "http://api:4000")
 
 st.set_page_config(page_title="Statistics | BargainHunters", page_icon="📊", layout="wide")
 

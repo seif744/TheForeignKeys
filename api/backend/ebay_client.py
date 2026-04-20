@@ -94,6 +94,32 @@ def get_item(item_id: int) -> dict:
     }
 
 
+def search(query: str, limit: int = 12) -> list:
+    """
+    Search eBay by keyword and return up to `limit` results.
+
+    Returns a list of:
+        {"id": str, "name": str, "url": str, "current_price": float, "thumbnail": str}
+    """
+    data = _get({
+        "engine": "ebay",
+        "api_key": _api_key(),
+        "_nkw": query,
+    })
+
+    results = (data or {}).get("organic_results", [])
+    output = []
+    for r in results[:limit]:
+        output.append({
+            "id": r.get("item_id", ""),
+            "name": r.get("title", ""),
+            "url": r.get("link", ""),
+            "current_price": float((r.get("price") or {}).get("extracted") or 0),
+            "thumbnail": r.get("thumbnail", ""),
+        })
+    return output
+
+
 def get_category(cat_id: int) -> dict:
     """
     Search eBay for the cheapest listing in a given category.

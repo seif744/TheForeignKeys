@@ -10,6 +10,8 @@ import requests
 from datetime import datetime
 from modules.nav import SideBarLinks, LOGO_PATH
 
+API_BASE = os.getenv("API_BASE", "http://api:4000")
+
 st.set_page_config(page_title="Feedback | BargainHunters", page_icon="💬", layout="wide")
 
 SideBarLinks(True)
@@ -19,6 +21,8 @@ if not st.session_state.get('authenticated'):
     st.switch_page('Home.py')
 if st.session_state.get('role') != 'user':
     st.switch_page('Home.py')
+if not st.session_state.get('user_id'):
+    st.switch_page('pages/00_user_select.py')
 
 # ── Logo + title ───────────────────────────────────────────────────────────
 logo_col, title_col = st.columns([1, 6])
@@ -53,7 +57,7 @@ with left:
         else:
             try:
                 resp = requests.post(
-                    "http://api:4000/feedback/",
+                    f"{API_BASE}/feedback/",
                     json={
                         "content": feedback_text.strip(),
                         "user_id": st.session_state.get("user_id"),
@@ -79,7 +83,7 @@ with right:
     st.markdown('<div class="section-label" style="margin-bottom:0.6rem;">Recent Feedback</div>', unsafe_allow_html=True)
 
     try:
-        resp = requests.get("http://api:4000/feedback/", timeout=5)
+        resp = requests.get(f"{API_BASE}/feedback/", timeout=5)
         resp.raise_for_status()
         entries = resp.json()
         logger.info(f"Fetched {len(entries)} feedback entries")

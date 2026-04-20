@@ -4,6 +4,19 @@ from backend import ebay_client
 ebay = Blueprint("ebay", __name__)
 
 
+@ebay.route("/search", methods=["GET"])
+def search_ebay():
+    query = request.args.get("q", "").strip()
+    if not query:
+        return jsonify({"error": "Missing query parameter 'q'"}), 400
+    try:
+        results = ebay_client.search(query)
+        return jsonify(results), 200
+    except (ConnectionError, RuntimeError) as e:
+        current_app.logger.error(f"GET /ebay/search error: {e}")
+        return jsonify({"error": "eBay API unreachable"}), 502
+
+
 @ebay.route("/listing", methods=["GET"])
 def get_listing():
     listing_id = request.args.get("listing_id", type=int)
