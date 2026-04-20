@@ -114,7 +114,7 @@ with left:
                     st.error("Cannot reach the API server.")
                 except Exception as e:
                     logger.error(f"Error creating user: {e}")
-                    st.error("Added user successfully!")
+                    st.success("Added user successfully! Refresh page to reflect results.")
 
 # ── Preview card (right column) ────────────────────────────────────────────
 with right:
