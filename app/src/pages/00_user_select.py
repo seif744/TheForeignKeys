@@ -76,7 +76,7 @@ with left:
                 st.session_state['user_id']   = selected_user['user_id']
                 st.session_state['user_name'] = selected_user['name']
                 logger.info(f"Session user: {selected_user['name']} (id={selected_user['user_id']})")
-                st.switch_page('pages/04_watchlist.py')
+                st.switch_page('pages/01_alert_creation.py')
 
     # ── Tab 2: new user ────────────────────────────────────────────
     with tab_new:
@@ -105,7 +105,7 @@ with left:
                         st.session_state['user_id']   = new_user['user_id']
                         st.session_state['user_name'] = new_user['name']
                         logger.info(f"Created user: {new_user['name']} (id={new_user['user_id']})")
-                        st.switch_page('pages/04_watchlist.py')
+                        st.switch_page('pages/01_alert_creation.py')
                     elif r.status_code == 409:
                         st.error("An account with that email already exists. Select it from the Existing User tab.")
                     else:
