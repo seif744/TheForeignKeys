@@ -80,9 +80,6 @@ def inject_global_css() -> None:
 def user_select_nav() -> None:
     st.sidebar.page_link("pages/00_user_select.py", label="Switch User",     icon="👤")
 
-def watchlist_nav() -> None:
-    st.sidebar.page_link("pages/04_watchlist.py",   label="My Watchlist",    icon="👁️")
-
 def alert_creation_nav() -> None:
     st.sidebar.page_link("pages/01_alert_creation.py", label="Add Alert",    icon="🔔")
 
@@ -123,7 +120,6 @@ def SideBarLinks(show_home=False) -> None:
         st.sidebar.markdown('<div class="section-label">Menu</div>', unsafe_allow_html=True)
 
         if st.session_state.get("role") == "user":
-            watchlist_nav()
             alert_creation_nav()
             statistics_nav()
             feedback_nav()

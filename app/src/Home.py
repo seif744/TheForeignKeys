@@ -28,7 +28,6 @@ st.markdown("---")
 signin_col, gap_col, info_col = st.columns([2, 1, 3])
 
 with signin_col:
-    st.markdown('<div class="card card-accent">', unsafe_allow_html=True)
     st.markdown('<div class="section-label">Sign in</div>', unsafe_allow_html=True)
     st.markdown("#### Select your account")
     st.markdown(

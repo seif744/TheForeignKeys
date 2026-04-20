@@ -39,7 +39,6 @@ st.markdown("---")
 left, _ , right = st.columns([3, 1, 3])
 
 with left:
-    st.markdown('<div class="card card-accent">', unsafe_allow_html=True)
     st.markdown('<div class="section-label">New Feedback</div>', unsafe_allow_html=True)
 
     feedback_text = st.text_area(
