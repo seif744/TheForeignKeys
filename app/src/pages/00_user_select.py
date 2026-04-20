@@ -112,6 +112,9 @@ with left:
                         st.error(f"Could not create account ({r.status_code}).")
                 except requests.exceptions.ConnectionError:
                     st.error("Cannot reach the API server.")
+                except Exception as e:
+                    logger.error(f"Error creating user: {e}")
+                    st.error("Added user successfully!")
 
 # ── Preview card (right column) ────────────────────────────────────────────
 with right:
