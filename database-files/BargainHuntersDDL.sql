@@ -150,35 +150,35 @@ CREATE TABLE notifications (
                                    FOREIGN KEY (alert_id) REFERENCES alerts(alert_id)
                                        ON DELETE CASCADE
 );
---Insert statement for users table
+-- Insert statement for users table
 INSERT INTO users (name, email) VALUES
 ('Alice Johnson', 'alice@example.com'),
 ('Bob Smith', 'bob@example.com'),
 ('Charlie Brown', 'charlie@example.com'),
 ('Diana Prince', 'diana@example.com'),
 ('Ethan Hunt', 'ethan@example.com');
---Insert statement for categories table
+-- Insert statement for categories table
 INSERT INTO categories (cat_id, cat_name, url, current_price) VALUES
 (1001, 'Electronics', 'https://example.com/electronics', 250.00),
 (1002, 'Fashion', 'https://example.com/fashion', 75.50),
 (1003, 'Home & Garden', 'https://example.com/home', 120.99),
 (1004, 'Toys', 'https://example.com/toys', 45.00),
 (1005, 'Sports', 'https://example.com/sports', 89.99);
---Insert statement for items table
+-- Insert statement for items table
 INSERT INTO items (item_id, item_name, url, current_price) VALUES
 (2001, 'iPhone 13', 'https://example.com/iphone13', 699.99),
 (2002, 'Nike Sneakers', 'https://example.com/nike', 120.00),
 (2003, 'Coffee Maker', 'https://example.com/coffee', 49.99),
 (2004, 'Lego Set', 'https://example.com/lego', 59.99),
 (2005, 'Basketball', 'https://example.com/basketball', 25.00);
---Insert statemnt for listings table
+-- Insert statement for listings table
 INSERT INTO listings (listing_id, listing_name, url, current_price) VALUES
 (3001, 'iPhone 13 - Used', 'https://example.com/listing1', 650.00),
 (3002, 'Nike Sneakers Sale', 'https://example.com/listing2', 100.00),
 (3003, 'Coffee Maker Discount', 'https://example.com/listing3', 39.99),
 (3004, 'Lego Set Bundle', 'https://example.com/listing4', 55.00),
 (3005, 'Basketball Deal', 'https://example.com/listing5', 20.00);
---Insert statement for user activity table
+-- Insert statement for user activity table
 INSERT INTO user_activity (event_type, user_id) VALUES
 ('login', 1),
 ('search_item', 2),

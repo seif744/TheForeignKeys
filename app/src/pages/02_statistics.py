@@ -72,9 +72,9 @@ col4.metric("Total Categories", len(categories), f"{active_cats} active")
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ── Average Prices ─────────────────────────────────────────────────────────
-listing_prices  = [l['current_price'] for l in listings   if l.get('current_price') is not None]
-item_prices     = [i['current_price'] for i in items      if i.get('current_price') is not None]
-cat_prices      = [c['current_price'] for c in categories if c.get('current_price') is not None]
+listing_prices  = [float(l['current_price']) for l in listings   if l.get('current_price') is not None]
+item_prices     = [float(i['current_price']) for i in items      if i.get('current_price') is not None]
+cat_prices      = [float(c['current_price']) for c in categories if c.get('current_price') is not None]
 
 if listing_prices or item_prices or cat_prices:
     st.markdown('<div class="section-label">Average Tracked Prices</div>', unsafe_allow_html=True)
