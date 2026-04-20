@@ -14,7 +14,7 @@ st.set_page_config(page_title="Add Alert | BargainHunters", page_icon="🔔", la
 st.markdown("""
 <style>
 [data-testid="stForm"] button[kind="primaryFormSubmit"] {
-    font-size: 0.72rem;
+    font-size: 0.50rem;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
 }
@@ -52,8 +52,8 @@ if st.session_state.get("alert_created"):
     )
     col1, col2 = st.columns([2, 5])
     with col1:
-        if st.button("Back to Watchlist →", type="primary", use_container_width=True):
-            st.switch_page("pages/04_watchlist.py")
+        if st.button("View Statistics →", type="primary", use_container_width=True):
+            st.switch_page("pages/02_statistics.py")
     with col2:
         if st.button("Create another alert", use_container_width=True):
             for key in ("search_results", "selected_listing"):

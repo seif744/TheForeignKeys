@@ -56,7 +56,6 @@ if not users:
 left, _, right = st.columns([3, 1, 3])
 
 with left:
-    st.markdown('<div class="card card-accent">', unsafe_allow_html=True)
     st.markdown('<div class="section-label">Account</div>', unsafe_allow_html=True)
 
     user_map = {f"{u['name']}  ·  {u['email']}": u for u in users}
@@ -68,7 +67,7 @@ with left:
         st.session_state['user_id']   = selected_user['user_id']
         st.session_state['user_name'] = selected_user['name']
         logger.info(f"Session user: {selected_user['name']} (id={selected_user['user_id']})")
-        st.switch_page('pages/04_watchlist.py')
+        st.switch_page('pages/01_alert_creation.py')
     st.markdown('</div>', unsafe_allow_html=True)
 
 with right:
