@@ -60,7 +60,7 @@ CREATE TABLE user_activity (
 -- ------------------------------------------------------------
 
 CREATE TABLE categories (
-                            cat_id      INT             NOT NULL, -- should be filled in with the coresponding ID from the ebay api
+                            cat_id      BIGINT          NOT NULL, -- should be filled in with the coresponding ID from the ebay api
                             cat_name    VARCHAR(255)    NOT NULL,
                             url         VARCHAR(2048)   NOT NULL,
                             is_active   BOOLEAN         NOT NULL DEFAULT TRUE,
@@ -71,7 +71,7 @@ CREATE TABLE categories (
 -- ------------------------------------------------------------
 
 CREATE TABLE items (
-                       item_id     INT             NOT NULL , -- should be filled in with the coresponding ID from the ebay api
+                       item_id     BIGINT          NOT NULL , -- should be filled in with the coresponding ID from the ebay api
                        item_name   VARCHAR(255)    NOT NULL,
                        url         VARCHAR(2048)   NOT NULL,
                        is_active   BOOLEAN         NOT NULL DEFAULT TRUE,
@@ -83,7 +83,7 @@ CREATE TABLE items (
 -- ------------------------------------------------------------
 
 CREATE TABLE listings (
-                          listing_id     INT             NOT NULL, -- should be filled in with the coresponding ID from the ebay api
+                          listing_id     BIGINT          NOT NULL, -- should be filled in with the coresponding ID from the ebay api
                           listing_name   VARCHAR(255)    NOT NULL,
                           url         VARCHAR(2048)   NOT NULL,
                           is_active   BOOLEAN         NOT NULL DEFAULT TRUE,
@@ -102,9 +102,9 @@ CREATE TABLE alerts (
                         drop_amt        DECIMAL(10, 2),
                         drop_percent    DECIMAL(5, 2),
                         original_price  DECIMAL(10, 2),
-                        item_id         INT,                       -- FK: nullable — alert targets item OR category OR listing
-                        cat_id          INT,                       -- FK: nullable — alert targets item OR category OR listing
-                        listing_id      INT,                       -- FK: nullable — alert targets item OR category OR listing
+                        item_id         BIGINT,                    -- FK: nullable — alert targets item OR category OR listing
+                        cat_id          BIGINT,                    -- FK: nullable — alert targets item OR category OR listing
+                        listing_id      BIGINT,                    -- FK: nullable — alert targets item OR category OR listing
                         PRIMARY KEY (alert_id),
                         CONSTRAINT fk_alerts_item
                             FOREIGN KEY (item_id) REFERENCES items(item_id)
